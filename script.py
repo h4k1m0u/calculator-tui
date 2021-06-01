@@ -1,5 +1,20 @@
 #!/usr/bin/env python
 import curses
+import curses.panel
+import time
+
+
+def make_panel(content, nlines, ncols, y, x):
+    """
+    Important to return panel otherwise will be garbage collected
+    """
+    win = curses.newwin(nlines, ncols, y, x)
+    win.box()
+    win.addstr(0, 0, content)
+    panel = curses.panel.new_panel(win)
+
+    return panel
+
 
 def main(stdscr: 'curses._CursesWindow'):
     """
@@ -17,8 +32,22 @@ def main(stdscr: 'curses._CursesWindow'):
     curses.curs_set(0)
 
     # main loop
-    c = ''
-    while c != ord('q'):
+    key = ''
+    while key != ord('q'):
+        # TODO: print a menu using panels
+        # panels: windows with depth - update virtual panels stack
+        panel1 = make_panel('Panel1', 10, 10, 0, 0)
+        panel2 = make_panel('Panel2', 10, 10, 5, 5)
+        curses.panel.update_panels()
+        stdscr.refresh()
+        
+        time.sleep(1)
+
+        panel1.top()
+        curses.panel.update_panels()
+
+        # stdscr.box()
+
         # terminal dimensions
         n_rows, n_cols = stdscr.getmaxyx()
 
@@ -33,12 +62,11 @@ def main(stdscr: 'curses._CursesWindow'):
         y_statusbar = n_rows - 1
         stdscr.attron(curses.color_pair(2))
         stdscr.addstr(y_statusbar, 0, statusbar)
-        stdscr.addstr(y_statusbar, len(statusbar), ' ' * (n_cols - len(statusbar) - 1))
-
-        # TODO: print a menu
+        stdscr.addstr(
+            y_statusbar, len(statusbar), ' ' * (n_cols - len(statusbar) - 1))
 
         # wait for keypress
-        c = stdscr.getch()
+        key = stdscr.getch()
 
 
 if __name__ == '__main__':
