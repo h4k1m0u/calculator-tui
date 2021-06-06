@@ -7,6 +7,7 @@ import curses.panel
 
 from menu import Menu
 from panel import make_panel
+from status_bar import draw_status_bar
 
 
 def main(stdscr: 'curses._CursesWindow'):
@@ -20,11 +21,9 @@ def main(stdscr: 'curses._CursesWindow'):
     curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
 
-    # hide cursor
+    # hide cursor & non-blocking `getch()`
     curses.curs_set(0)
-
-    # terminal dimensions
-    n_rows_stdscr, n_cols_stdscr = stdscr.getmaxyx()
+    stdscr.nodelay(True)
 
     # menu
     items = ['Run game', 'Options', 'Quit game']
@@ -44,13 +43,7 @@ def main(stdscr: 'curses._CursesWindow'):
         # panel2 = make_panel(stdscr, 'Panel2', 10, 10, 25, 25)  # noqa: F841,E501 #pylint: disable=unused-variable
 
         # status bar
-        statusbar = ' Up/Down: navigation, Q: exit'
-        y_statusbar = n_rows_stdscr - 1
-        stdscr.attron(curses.color_pair(2))
-        stdscr.addstr(y_statusbar, 0, statusbar)
-        stdscr.addstr(
-            y_statusbar, len(statusbar),
-            ' ' * (n_cols_stdscr - len(statusbar) - 1))
+        draw_status_bar(stdscr)
 
         # wait for keypress
         key = stdscr.getch()
@@ -60,7 +53,8 @@ def main(stdscr: 'curses._CursesWindow'):
             menu.move(step=-1)
         elif key == curses.KEY_DOWN:
             menu.move(step=1)
-        elif key == ord('q'):
+        elif (key == ord('\n') and menu.position == len(items) - 1) or \
+                key == ord('q'):
             break
 
 
