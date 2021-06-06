@@ -14,8 +14,16 @@ class Menu:
         @param items  labels for menu items
         @param stdscr parent window
         """
+        # position menu at center of main screen (padding around for borders)
         self.items = items
-        self.window = stdscr.subwin(0, 0)
+        n_rows_stdscr, n_cols_stdscr = stdscr.getmaxyx()
+        max_len_item = max(len(item) for item in self.items)
+        n_rows, n_cols = len(self.items) + 2, max_len_item + 2
+        col = n_cols_stdscr // 2 - max_len_item // 2
+        row = n_rows_stdscr // 2 - n_rows // 2
+
+        # subwin: window shares memory with parent (no need for its repainting)
+        self.window = stdscr.subwin(n_rows, n_cols, row, col)
         self.position = 0
 
         # needed so curses can interpret arrow keys presses
@@ -45,4 +53,7 @@ class Menu:
             else:
                 mode = curses.A_NORMAL
 
-            self.window.addstr(i_item, 0, item, mode)
+            self.window.addstr(i_item + 1, 1, item, mode)
+
+        # border around menu
+        self.window.box()

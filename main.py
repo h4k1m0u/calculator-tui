@@ -17,43 +17,40 @@ def main(stdscr: 'curses._CursesWindow'):
     @param stdscr Main screen (Window) to print onto
     """
     # initialize & define terminal colors
-    curses.start_color()
     curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
 
     # hide cursor
     curses.curs_set(0)
 
-    # main loop
+    # terminal dimensions
+    n_rows_stdscr, n_cols_stdscr = stdscr.getmaxyx()
+
+    # menu
     items = ['Run game', 'Options', 'Quit game']
     menu = Menu(stdscr, items)
 
-    key = ''
+    # main loop
     while True:
+        # clear only internal screen
+        stdscr.erase()
+
         # render menu
+        stdscr.attron(curses.A_BOLD | curses.color_pair(1))
         menu.draw()
 
         # panels: windows with depth (no linters) - update virtual panels stack
-        panel1 = make_panel('Panel1', 10, 10, 20, 20)  # noqa: F841,E501 #pylint: disable=unused-variable
-        panel2 = make_panel('Panel2', 10, 10, 25, 25)  # noqa: F841,E501 #pylint: disable=unused-variable
-        curses.panel.update_panels()
+        # panel1 = make_panel(stdscr, 'Panel1', 10, 10, 20, 20)  # noqa: F841,E501 #pylint: disable=unused-variable
+        # panel2 = make_panel(stdscr, 'Panel2', 10, 10, 25, 25)  # noqa: F841,E501 #pylint: disable=unused-variable
 
-        # terminal dimensions
-        n_rows, n_cols = stdscr.getmaxyx()
-
-        # print message at center of screen
-        message = 'Hello to this app'
-        x_message, y_message = n_cols // 2 - len(message) // 2, n_rows // 2
-        stdscr.attron(curses.A_BOLD | curses.color_pair(1))
-        stdscr.addstr(y_message, x_message, message)
-
-        # print status bar
-        statusbar = " Press 'q' to exit"
-        y_statusbar = n_rows - 1
+        # status bar
+        statusbar = ' Up/Down: navigation, Q: exit'
+        y_statusbar = n_rows_stdscr - 1
         stdscr.attron(curses.color_pair(2))
         stdscr.addstr(y_statusbar, 0, statusbar)
         stdscr.addstr(
-            y_statusbar, len(statusbar), ' ' * (n_cols - len(statusbar) - 1))
+            y_statusbar, len(statusbar),
+            ' ' * (n_cols_stdscr - len(statusbar) - 1))
 
         # wait for keypress
         key = stdscr.getch()
