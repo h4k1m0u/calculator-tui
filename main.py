@@ -3,10 +3,8 @@
 Render a terminal UI with menu & status bar
 """
 import curses
-import curses.panel
 
 from menu import Menu
-from panel import make_panel
 from status_bar import draw_status_bar
 
 
@@ -26,7 +24,12 @@ def main(stdscr: 'curses._CursesWindow'):
     stdscr.nodelay(True)
 
     # menu
-    items = ['Run game', 'Options', 'Quit game']
+    items = [
+        ['7', '8', '9', '/'],
+        ['4', '5', '6', '*'],
+        ['1', '2', '3', '-'],
+        ['0', '.', '=', '+'],
+    ]
     menu = Menu(stdscr, items)
 
     # main loop
@@ -38,10 +41,6 @@ def main(stdscr: 'curses._CursesWindow'):
         stdscr.attron(curses.A_BOLD | curses.color_pair(1))
         menu.draw()
 
-        # panels: windows with depth (no linters) - update virtual panels stack
-        # panel1 = make_panel(stdscr, 'Panel1', 10, 10, 20, 20)  # noqa: F841,E501 #pylint: disable=unused-variable
-        # panel2 = make_panel(stdscr, 'Panel2', 10, 10, 25, 25)  # noqa: F841,E501 #pylint: disable=unused-variable
-
         # status bar
         draw_status_bar(stdscr)
 
@@ -50,11 +49,14 @@ def main(stdscr: 'curses._CursesWindow'):
 
         # menu navigation with arrow keys presses
         if key == curses.KEY_UP:
-            menu.move(step=-1)
+            menu.move_vertically(step=-1)
         elif key == curses.KEY_DOWN:
-            menu.move(step=1)
-        elif (key == ord('\n') and menu.position == len(items) - 1) or \
-                key == ord('q'):
+            menu.move_vertically(step=1)
+        if key == curses.KEY_LEFT:
+            menu.move_horizontally(step=-1)
+        elif key == curses.KEY_RIGHT:
+            menu.move_horizontally(step=1)
+        elif key == ord('q'):
             break
 
 
