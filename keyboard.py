@@ -1,29 +1,21 @@
 #!/usr/bin/env python
 """
-Inspired by: https://stackoverflow.com/a/14205494/2228912
+Inspired by menu class from: https://stackoverflow.com/a/14205494/2228912
 """
 import curses
 
 
-class Menu:
+class Keyboard:
     """
-    Menu with fixed items
+    Calculator keyboard
     """
     def __init__(self, stdscr: 'curses._CursesWindow', items):
         """
-        @param items  2D list of labels for buttons
         @param stdscr parent window
+        @param items  2D list of labels for keyboard buttons
         """
         # position menu at center of main screen (padding around for borders)
         self.items = items
-        """
-        n_rows_stdscr, n_cols_stdscr = stdscr.getmaxyx()
-        max_len_item = max(len(item) for item in self.items)
-        n_rows, n_cols = len(self.items) + 2, max_len_item + 2
-        col = n_cols_stdscr // 2 - max_len_item // 2
-        row = n_rows_stdscr // 2 - n_rows // 2
-        """
-
         self.n_rows = len(self.items)
         self.n_cols = len(self.items[0])
         self.depth = len(self.items[0][0])
@@ -62,6 +54,13 @@ class Menu:
             return
 
         self.col = self.col + step
+
+    def get_key(self):
+        """
+        Get label of currently highlighted calculator key
+        """
+        key = self.items[self.row][self.col]
+        return key
 
     def draw(self):
         """

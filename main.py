@@ -4,7 +4,8 @@ Render a terminal UI with menu & status bar
 """
 import curses
 
-from menu import Menu
+from keyboard import Keyboard
+from screen import Screen
 from status_bar import draw_status_bar
 
 
@@ -23,41 +24,48 @@ def main(stdscr: 'curses._CursesWindow'):
     curses.curs_set(0)
     stdscr.nodelay(True)
 
-    # menu
+    # calculator keyboard & screen
     items = [
         ['7', '8', '9', '/'],
         ['4', '5', '6', '*'],
         ['1', '2', '3', '-'],
         ['0', '.', '=', '+'],
     ]
-    menu = Menu(stdscr, items)
+    keyboard = Keyboard(stdscr, items)
+    screen = Screen(stdscr)
+    key_pressed = ''
 
     # main loop
     while True:
         # clear only internal screen
         stdscr.erase()
 
-        # render menu
+        # render calculator keyboard & screen
         stdscr.attron(curses.A_BOLD | curses.color_pair(1))
-        menu.draw()
+        keyboard.draw()
+        screen.draw(key_pressed)
 
         # status bar
         draw_status_bar(stdscr)
 
         # wait for keypress
-        key = stdscr.getch()
+        character = stdscr.getch()
 
-        # menu navigation with arrow keys presses
-        if key == curses.KEY_UP:
-            menu.move_vertically(step=-1)
-        elif key == curses.KEY_DOWN:
-            menu.move_vertically(step=1)
-        if key == curses.KEY_LEFT:
-            menu.move_horizontally(step=-1)
-        elif key == curses.KEY_RIGHT:
-            menu.move_horizontally(step=1)
-        elif key == ord('q'):
+        # keyboard navigation with arrow keys presses
+        if character == curses.KEY_UP:
+            keyboard.move_vertically(step=-1)
+        elif character == curses.KEY_DOWN:
+            keyboard.move_vertically(step=1)
+        if character == curses.KEY_LEFT:
+            keyboard.move_horizontally(step=-1)
+        elif character == curses.KEY_RIGHT:
+            keyboard.move_horizontally(step=1)
+        elif character == ord('\n'):
+            key_pressed = keyboard.get_key()
+        elif character == ord('q'):
             break
+
+        # stdscr.refresh()
 
 
 if __name__ == '__main__':
