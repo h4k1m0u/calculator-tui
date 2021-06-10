@@ -24,7 +24,7 @@ class Keyboard:
 
         # subwin: window shares memory with parent (no need for its repainting)
         self.window = stdscr.subwin(
-            self.n_rows, self.n_cols * self.depth + 1, 0, 0)
+            self.n_rows, self.n_cols * self.depth, 0, 0)
 
         # needed so curses can interpret arrow keys presses
         # self.window.keypad(1)
@@ -58,15 +58,16 @@ class Keyboard:
     def get_key(self):
         """
         Get label of currently highlighted calculator key
+        @returns button label
         """
-        key = self.items[self.row][self.col]
-        return key
+        return self.items[self.row][self.col]
 
     def draw(self):
         """
         Render menu items & highlight currently selected one
         """
-        # render menu items (active/inactive)
+        # render calculator keys (active/inactive)
+        # `insstr()` doesn't push cursor outside window (error) like `addstr()`
         for i_row in range(self.n_rows):
             for i_col in range(self.n_cols):
                 if i_row == self.row and i_col == self.col:
@@ -75,7 +76,7 @@ class Keyboard:
                     mode = curses.A_NORMAL
 
                 text = self.items[i_row][i_col]
-                self.window.addstr(i_row, i_col * self.depth, text, mode)
+                self.window.insstr(i_row, i_col * self.depth, text, mode)
 
         # border around menu
         # self.window.box()

@@ -33,39 +33,58 @@ def main(stdscr: 'curses._CursesWindow'):
     ]
     keyboard = Keyboard(stdscr, items)
     screen = Screen(stdscr)
-    key_pressed = ''
+
+    # operands & operation
+    operand1 = operand2 = 0
+    operation = ''
+    screen_content = ''
 
     # main loop
     while True:
         # clear only internal screen
         stdscr.erase()
 
-        # render calculator keyboard & screen
+        # render calculator keyboard/screen
         stdscr.attron(curses.A_BOLD | curses.color_pair(1))
         keyboard.draw()
-        screen.draw(key_pressed)
+        screen.draw()
 
         # status bar
         draw_status_bar(stdscr)
 
         # wait for keypress
-        character = stdscr.getch()
+        key = stdscr.getch()
 
         # keyboard navigation with arrow keys presses
-        if character == curses.KEY_UP:
+        if key == curses.KEY_UP:
             keyboard.move_vertically(step=-1)
-        elif character == curses.KEY_DOWN:
+        elif key == curses.KEY_DOWN:
             keyboard.move_vertically(step=1)
-        if character == curses.KEY_LEFT:
+        elif key == curses.KEY_LEFT:
             keyboard.move_horizontally(step=-1)
-        elif character == curses.KEY_RIGHT:
+        elif key == curses.KEY_RIGHT:
             keyboard.move_horizontally(step=1)
-        elif character == ord('\n'):
-            key_pressed = keyboard.get_key()
-        elif character == ord('q'):
-            break
+        elif key == ord('\n'):
+            character = keyboard.get_key()
 
-        # stdscr.refresh()
+            if character.isdigit():
+                # one of two operands
+                screen_content += character
+            elif character in ['/', '*', '-', '+']:
+                # save first operand and operation & clean screen
+                operand1 = int(screen_content)
+                operation = character
+                screen_content = ''
+            elif character == '=':
+                # evaluate operation between two operands
+                operand2 = int(screen_content)
+                screen_content = str(
+                    eval('{} {} {}'.format(operand1, operation, operand2)))
+
+            # update screen with operands or result
+            screen.set_content(screen_content)
+        elif key == ord('q'):
+            break
 
 
 if __name__ == '__main__':

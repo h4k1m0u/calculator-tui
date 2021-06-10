@@ -11,12 +11,21 @@ class Screen:
         @param stdscr parent window
         """
         # window just above status bar
-        n_rows, n_cols = stdscr.getmaxyx()
-        self.window = stdscr.subwin(1, n_cols, n_rows - 2, 0)
+        n_rows_stdscr, n_cols_stdscr = stdscr.getmaxyx()
+        self.n_rows, self.n_cols = 1, n_cols_stdscr
+        self.window = stdscr.subwin(
+            self.n_rows, self.n_cols, n_rows_stdscr - 2, 0)
+        self.content = ''
 
-    def draw(self, text):
+    def set_content(self, text):
+        """
+        Set screen content
+        @param text string to set screen content to in `draw()`
+        """
+        self.content = text
+
+    def draw(self):
         """
         Render given text on screen
-        @param text string to render
         """
-        self.window.addstr(0, 0, text, curses.A_REVERSE)
+        self.window.addstr(0, 0, self.content, curses.A_REVERSE)
