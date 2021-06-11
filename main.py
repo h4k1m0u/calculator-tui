@@ -4,9 +4,9 @@ Render a terminal UI with menu & status bar
 """
 import curses
 
-from keyboard import Keyboard
-from screen import Screen
-from status_bar import draw_status_bar
+from ui.keyboard import Keyboard
+from ui.screen import Screen
+from ui.status_bar import draw_status_bar
 
 
 def main(stdscr: 'curses._CursesWindow'):
@@ -32,7 +32,7 @@ def main(stdscr: 'curses._CursesWindow'):
         ['0', '.', '=', '+'],
     ]
     keyboard = Keyboard(stdscr, items)
-    screen = Screen(stdscr)
+    screen = Screen(stdscr, keyboard.width)
 
     # operands & operation
     operand1 = operand2 = 0

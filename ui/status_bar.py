@@ -16,16 +16,18 @@ def draw_status_bar(stdscr):
     window = stdscr.subwin(1, n_cols_stdscr, y_statusbar, 0)
     window.attron(curses.color_pair(2))
 
-    # shortcuts on left of statusbar
-    shortcuts = ' up/down: Navigation, enter: Select, q: Quit'
-    window.addstr(0, 0, shortcuts)
-
-    # current time on right of statusbar
+    # content to render
+    shortcuts = ' arrow keys: Navigation, enter: Type digit, q: Quit'
     current_time = time.strftime('%H:%M:%S', time.localtime())
-    window.addstr(
-        0, n_cols_stdscr - 1 - len(current_time), current_time)
+
+    # shortcuts on left of statusbar
+    window.insstr(0, 0, shortcuts)
 
     # fill space in between
-    window.addstr(
+    window.insstr(
         0, len(shortcuts),
-        ' ' * (n_cols_stdscr - 1 - (len(shortcuts) + len(current_time))))
+        ' ' * (n_cols_stdscr - (len(shortcuts) + len(current_time))))
+
+    # current time on right of statusbar
+    window.insstr(
+        0, n_cols_stdscr - len(current_time), current_time)
