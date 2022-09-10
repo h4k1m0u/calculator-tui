@@ -1,3 +1,13 @@
+# Screenshot
+![Screenshot](/images/screenshot.png)
+
+# Description
+Basic calculator with a TUI (Terminal User Interface) built with Curses and run as follows:
+
+```terminal
+$ python3 main.py
+```
+
 # Resources
 - [Official python API][official-api]
 - [Official tutorial][official-tutorial]
